@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.yakindu.sct.model.sgraph.State;
 import org.yakindu.sct.model.sgraph.Statechart;
 import org.yakindu.sct.model.sgraph.Transition;
+import org.yakindu.sct.model.stext.stext.EventDefinition;
+import org.yakindu.sct.model.stext.stext.VariableDefinition;
 
 import hu.bme.mit.model2gml.Model2GML;
 import hu.bme.mit.yakindu.analysis.modelmanager.ModelManager;
@@ -31,6 +33,8 @@ public class Main {
 		TreeIterator<EObject> iterator = s.eAllContents();
 		List<State> csapdak = new LinkedList<State>();
 		List<State> nevtelenek = new LinkedList<State>();
+		List<VariableDefinition> belsoValtozok = new LinkedList<VariableDefinition>();
+		List<EventDefinition> bemenoEsemenyek = new LinkedList<EventDefinition>();
 		while (iterator.hasNext()) {
 			EObject content = iterator.next();
 			if(content instanceof State) {
@@ -45,6 +49,12 @@ public class Main {
 				Transition tr = (Transition) content;
 				System.out.println(tr.getSource().getName()
 						+ " -> " + tr.getTarget().getName());
+			}
+			else if(content instanceof VariableDefinition) {
+				belsoValtozok.add((VariableDefinition) content);
+			}
+			else if(content instanceof EventDefinition) {
+				bemenoEsemenyek.add((EventDefinition) content);
 			}
 		}
 		System.out.println("Csapda allapotok:");
@@ -66,6 +76,14 @@ public class Main {
 			}
 			state.setName("S" + id);
 			System.out.println("S" + id);
+		}
+		System.out.println("Belso valtozok:");
+		for (VariableDefinition v : belsoValtozok) {
+			System.out.println(v.getName());
+		}
+		System.out.println("Bemeno esemenyek");
+		for (EventDefinition e : bemenoEsemenyek) {
+			System.out.println(e.getName());
 		}
 		
 		// Transforming the model into a graph representation
