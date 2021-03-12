@@ -2,6 +2,7 @@ package hu.bme.mit.yakindu.analysis.workhere;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
@@ -31,13 +32,13 @@ public class Main {
 		// Reading model
 		Statechart s = (Statechart) root;
 		TreeIterator<EObject> iterator = s.eAllContents();
-		List<State> csapdak = new LinkedList<State>();
-		List<State> nevtelenek = new LinkedList<State>();
+		//List<State> csapdak = new LinkedList<State>();
+		//List<State> nevtelenek = new LinkedList<State>();
 		List<VariableDefinition> belsoValtozok = new LinkedList<VariableDefinition>();
 		List<EventDefinition> bemenoEsemenyek = new LinkedList<EventDefinition>();
 		while (iterator.hasNext()) {
 			EObject content = iterator.next();
-			if(content instanceof State) {
+			/*if(content instanceof State) {
 				State state = (State) content;
 				String actual = state.getName();
 				System.out.println(actual);
@@ -50,14 +51,14 @@ public class Main {
 				System.out.println(tr.getSource().getName()
 						+ " -> " + tr.getTarget().getName());
 			}
-			else if(content instanceof VariableDefinition) {
+			else*/ if(content instanceof VariableDefinition) {
 				belsoValtozok.add((VariableDefinition) content);
 			}
 			else if(content instanceof EventDefinition) {
 				bemenoEsemenyek.add((EventDefinition) content);
 			}
 		}
-		System.out.println("Csapda allapotok:");
+		/*System.out.println("Csapda allapotok:");
 		for (State state : csapdak) {
 			System.out.println(state.getName());
 		}
@@ -76,15 +77,52 @@ public class Main {
 			}
 			state.setName("S" + id);
 			System.out.println("S" + id);
-		}
-		System.out.println("Belso valtozok:");
+		}*/
+		System.out.println("package hu.bme.mit.yakindu.analysis.workhere;\r\n" + 
+				"\r\n" + 
+				"import java.io.IOException;\r\n" + 
+				"import java.util.Scanner;\r\n" + 
+				"\r\n" + 
+				"import hu.bme.mit.yakindu.analysis.RuntimeService;\r\n" + 
+				"import hu.bme.mit.yakindu.analysis.TimerService;\r\n" + 
+				"import hu.bme.mit.yakindu.analysis.example.ExampleStatemachine;\r\n" + 
+				"import hu.bme.mit.yakindu.analysis.example.IExampleStatemachine;\r\n" + 
+				"\r\n" + 
+				"\r\n" + 
+				"public class RunStatechart {\r\n" + 
+				"	\r\n" + 
+				"	public static void main(String[] args) throws IOException {\r\n" + 
+				"		ExampleStatemachine s = new ExampleStatemachine();\r\n" + 
+				"		s.setTimer(new TimerService());\r\n" + 
+				"		RuntimeService.getInstance().registerStatemachine(s, 200);\r\n" + 
+				"		s.init();\r\n" + 
+				"		s.enter();\r\n" + 
+				"		s.runCycle();\r\n" +
+				"		Scanner scanner = new Scanner(System.in);\r\n" + 
+				"		while(true) {\r\n" + 
+				"			switch (scanner.next()) {");
+				for (EventDefinition e : bemenoEsemenyek) {
+					String nagyKezdobetu = e.getName().substring(0, 1).toUpperCase() + e.getName().substring(1);
+					System.out.println(
+				"			case \""+e.getName()+"\":\r\n" + 
+				"				s.raise"+nagyKezdobetu+"();\r\n" + 
+				"				s.runCycle();\r\n" + 
+				"				break;");
+				}
+				System.out.println(
+				"			case \"exit\":\r\n" + 
+				"				System.exit(0);\r\n" + 
+				"				break;\r\n" + 
+				"			}\r\n" + 
+				"			print(s);\r\n" + 
+				"		}\r\n" + 
+				"	}\r\n\r\n" + 
+				"	public static void print(IExampleStatemachine s) {");
 		for (VariableDefinition v : belsoValtozok) {
-			System.out.println(v.getName());
+			String nagyKezdobetu = v.getName().substring(0, 1).toUpperCase() + v.getName().substring(1);
+			System.out.println("		System.out.println(\""+v.getName()+" = \" + s.getSCInterface().get"+nagyKezdobetu+"());");
 		}
-		System.out.println("Bemeno esemenyek");
-		for (EventDefinition e : bemenoEsemenyek) {
-			System.out.println(e.getName());
-		}
+		System.out.println("	}\r\n}");
 		
 		// Transforming the model into a graph representation
 		String content = model2gml.transform(root);
